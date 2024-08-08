@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema, LoginFormValue } from "@/schemas";
+import { RegisterSchema, RegisterFormValue } from "@/schemas";
 
 import {
   Form,
@@ -17,29 +17,30 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CardWrapper from "@/components/auth/card-wrapper";
 import FormMessageCustom from "@/components/common/form-message-custom";
-import { login } from "@/actions/login";
+import { createAccount } from "@/actions/register";
 
 type FormMessageServer = {
   type: "success" | "error";
   message: string;
 };
 
-function LoginForm() {
+function RegisterForm() {
   const [formMessage, setFormMessage] = useState<FormMessageServer>({
     type: "error",
     message: "",
   });
 
-  const form = useForm<LoginFormValue>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<RegisterFormValue>({
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
       email: "",
       password: "",
+      name: "",
     },
   });
 
-  const onSubmit = (values: LoginFormValue) => {
-    login(values)
+  const onSubmit = (values: RegisterFormValue) => {
+    createAccount(values)
       .then((data) =>
         setFormMessage({ type: "success", message: data.message })
       )
@@ -50,14 +51,27 @@ function LoginForm() {
 
   return (
     <CardWrapper
-      headerLabel="Welcome to Login"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
-      showSocial
+      headerLabel="Create an account"
+      backButtonLabel="Already have an account?"
+      backButtonHref="/auth/login"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
+            {/* Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="John Vu" type="text" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             {/* Email  */}
             <FormField
               control={form.control}
@@ -98,7 +112,7 @@ function LoginForm() {
             message={formMessage.message}
           />
           <Button className="w-full" type="submit">
-            Login
+            Create an account
           </Button>
         </form>
       </Form>
@@ -106,4 +120,4 @@ function LoginForm() {
   );
 }
 
-export default LoginForm;
+export default RegisterForm;
