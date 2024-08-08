@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import CryptoJS from "crypto-js";
 import { RegisterSchema, RegisterFormValue } from "@/schemas";
 
 import {
@@ -18,10 +19,14 @@ import { Button } from "@/components/ui/button";
 import CardWrapper from "@/components/auth/card-wrapper";
 import FormMessageCustom from "@/components/common/form-message-custom";
 import { createAccount } from "@/actions/register";
+import { FormMessageServer } from "@/types/auth";
+// import { encryptData } from "@/utils/auth";
 
-type FormMessageServer = {
-  type: "success" | "error";
-  message: string;
+export const encryptData = (data: any) => {
+  return CryptoJS.AES.encrypt(
+    JSON.stringify(data),
+    process.env.NEXT_PUBLIC_SECRET_KEY || ""
+  ).toString();
 };
 
 function RegisterForm() {
@@ -40,13 +45,10 @@ function RegisterForm() {
   });
 
   const onSubmit = (values: RegisterFormValue) => {
-    createAccount(values)
-      .then((data) =>
-        setFormMessage({ type: "success", message: data.message })
-      )
-      .catch((data) =>
-        setFormMessage({ type: "error", message: data.message })
-      );
+    const payload = encryptData(values);
+    createAccount(payload)
+      .then(({ type, message }) => setFormMessage({ type, message }))
+      .catch(({ type, message }) => setFormMessage({ type, message }));
   };
 
   return (

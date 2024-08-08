@@ -18,11 +18,7 @@ import { Button } from "@/components/ui/button";
 import CardWrapper from "@/components/auth/card-wrapper";
 import FormMessageCustom from "@/components/common/form-message-custom";
 import { login } from "@/actions/login";
-
-type FormMessageServer = {
-  type: "success" | "error";
-  message: string;
-};
+import { FormMessageServer } from "@/types/auth";
 
 function LoginForm() {
   const [formMessage, setFormMessage] = useState<FormMessageServer>({
@@ -40,12 +36,8 @@ function LoginForm() {
 
   const onSubmit = (values: LoginFormValue) => {
     login(values)
-      .then((data) =>
-        setFormMessage({ type: "success", message: data.message })
-      )
-      .catch((data) =>
-        setFormMessage({ type: "error", message: data.message })
-      );
+      .then(({ type, message }) => setFormMessage({ type, message }))
+      .catch(({ type, message }) => setFormMessage({ type, message }));
   };
 
   return (
