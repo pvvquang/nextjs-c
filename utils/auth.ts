@@ -1,6 +1,4 @@
-"use server";
-
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import CryptoJS from "crypto-js";
 
 // const SECRET_KEY = "TX57f8x|wed|O]$YoO#JODX}fk]_l7k1";
