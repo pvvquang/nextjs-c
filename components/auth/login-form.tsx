@@ -1,9 +1,9 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, LoginFormValue } from "@/schemas";
+import { useSearchParams } from "next/navigation";
 
 import {
   Form,
@@ -19,9 +19,10 @@ import CardWrapper from "@/components/auth/card-wrapper";
 import FormMessageCustom from "@/components/common/form-message-custom";
 import { login } from "@/actions/login";
 import { FormMessageServer } from "@/types/auth";
-import { encryptData } from "./register-form";
+import { encryptData } from "@/components/auth/register-form";
 
 function LoginForm() {
+  const searchParams = useSearchParams();
   const [formMessage, setFormMessage] = useState<FormMessageServer>({
     type: "error",
     message: "",
@@ -41,6 +42,15 @@ function LoginForm() {
       .then(({ type, message }) => setFormMessage({ type, message }))
       .catch(({ type, message }) => setFormMessage({ type, message }));
   };
+
+  useEffect(() => {
+    if (searchParams.get("error") === "OAuthAccountNotLinked") {
+      setFormMessage({
+        type: "error",
+        message: "Email already in use with different provider!",
+      });
+    }
+  }, [searchParams]);
 
   return (
     <CardWrapper

@@ -27,3 +27,12 @@ export const createNewUser = async (data: RegisterFormValue) => {
     await db.user.create({ data: { name, email, password: hashedPassword } });
   } catch {}
 };
+
+export const updateUserVerifiedEmail = async (id: string) => {
+  try {
+    await db.user.update({
+      where: { id },
+      data: { emailVerified: new Date() },
+    });
+  } catch {}
+};

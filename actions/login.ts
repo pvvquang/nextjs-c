@@ -1,11 +1,13 @@
 "use server";
 
-import { signIn } from "@/auth";
-import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
+import { signIn, signOut } from "@/auth";
+import { getUserByEmail } from "@/data/user";
+import { DEFAULT_LOGIN, DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { LoginSchema, LoginFormValue } from "@/schemas";
 import { FormMessageServer } from "@/types/auth";
 import { decryptData } from "@/utils/auth";
 import { AuthError } from "next-auth";
+import { redirect } from "next/navigation";
 
 export async function login(values: string): Promise<FormMessageServer> {
   try {
@@ -32,5 +34,18 @@ export async function login(values: string): Promise<FormMessageServer> {
       }
     }
     throw error;
+  }
+}
+
+export async function checkUserExists(_email: string) {
+  try {
+    const userExists = getUserByEmail(_email);
+    if (!userExists) {
+      await signOut();
+      redirect(DEFAULT_LOGIN);
+    }
+  } catch {
+    await signOut();
+    redirect(DEFAULT_LOGIN);
   }
 }
