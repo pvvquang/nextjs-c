@@ -19,6 +19,7 @@ import CardWrapper from "@/components/auth/card-wrapper";
 import FormMessageCustom from "@/components/common/form-message-custom";
 import { login } from "@/actions/login";
 import { FormMessageServer } from "@/types/auth";
+import { encryptData } from "./register-form";
 
 function LoginForm() {
   const [formMessage, setFormMessage] = useState<FormMessageServer>({
@@ -35,7 +36,8 @@ function LoginForm() {
   });
 
   const onSubmit = (values: LoginFormValue) => {
-    login(values)
+    const payload = encryptData(values);
+    login(payload)
       .then(({ type, message }) => setFormMessage({ type, message }))
       .catch(({ type, message }) => setFormMessage({ type, message }));
   };

@@ -4,13 +4,13 @@ import { signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { LoginSchema, LoginFormValue } from "@/schemas";
 import { FormMessageServer } from "@/types/auth";
+import { decryptData } from "@/utils/auth";
 import { AuthError } from "next-auth";
 
-export async function login(
-  values: LoginFormValue
-): Promise<FormMessageServer> {
+export async function login(values: string): Promise<FormMessageServer> {
   try {
-    const validateFields = LoginSchema.safeParse(values);
+    const loginValue = (await decryptData(values)) as LoginFormValue;
+    const validateFields = LoginSchema.safeParse(loginValue);
     if (!validateFields.success) {
       return { type: "success", message: "Invalid filed!" };
     }
