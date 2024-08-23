@@ -7,5 +7,6 @@
     },
     "scminput": true,
     "git-commit": true
-  }
+  },
+  "cSpell.words": ["uuidv"]
 }

@@ -1,6 +1,8 @@
 "use server";
 
+import { generateVerificationToken } from "@/data/token";
 import { createNewUser, getUserByEmail } from "@/data/user";
+import { sendVerificationEmail } from "@/lib/mail";
 import { RegisterSchema, RegisterFormValue } from "@/schemas";
 import { FormMessageServer } from "@/types/auth";
 import { decryptData } from "@/utils/auth";
@@ -13,13 +15,20 @@ export async function createAccount(value: string): Promise<FormMessageServer> {
       return { message: "Invalid filed!", type: "error" };
     }
 
-    const existingUser = await getUserByEmail(validateFields.data.email);
+    const { email } = validateFields.data;
+
+    const existingUser = await getUserByEmail(email);
     if (existingUser) {
       return { type: "error", message: "Email already in use!" };
     }
     await createNewUser(validateFields.data);
-    return { message: "User created!", type: "success" };
+
+    // TODO: Send verification token email
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(email, verificationToken.token);
+
+    return { message: "Confirmation email sent!", type: "success" };
   } catch {
-    return { message: "Something went wrong!", type: "success" };
+    return { message: "Something went wrong!", type: "error" };
   }
 }
