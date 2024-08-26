@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { RegisterFormValue } from "@/schemas";
+import { NewPasswordFormValue, RegisterFormValue } from "@/schemas";
 import { hashPassword } from "@/utils/auth";
 
 export const getUserByEmail = async (email: string) => {

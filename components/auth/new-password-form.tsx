@@ -1,10 +1,8 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema, LoginFormValue } from "@/schemas";
-import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { NewPasswordSchema, NewPasswordFormValue } from "@/schemas";
 
 import {
   Form,
@@ -18,72 +16,45 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import CardWrapper from "@/components/auth/card-wrapper";
 import FormMessageCustom from "@/components/common/form-message-custom";
-import { login } from "@/actions/login";
 import { FormMessageServer } from "@/types/auth";
 import { encryptData } from "@/components/auth/register-form";
+import { newPassword } from "@/actions/new-password";
+import { useSearchParams } from "next/navigation";
 
-function LoginForm() {
+function NewPasswordForm() {
   const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [formMessage, setFormMessage] = useState<FormMessageServer>({
     type: "error",
     message: "",
   });
 
-  const form = useForm<LoginFormValue>({
-    resolver: zodResolver(LoginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  const form = useForm<NewPasswordFormValue>({
+    resolver: zodResolver(NewPasswordSchema),
+    defaultValues: { password: "" },
   });
 
-  const onSubmit = (values: LoginFormValue) => {
+  const onSubmit = (values: NewPasswordFormValue) => {
+    // TODO: reset password
     const payload = encryptData(values);
     startTransition(() => {
-      login(payload)
-        .then(({ type, message }) => setFormMessage({ type, message }))
-        .catch(({ type, message }) => setFormMessage({ type, message }));
+      newPassword(payload, token)
+        .then((res) => setFormMessage(res))
+        .catch((err) => setFormMessage(err));
     });
   };
 
-  useEffect(() => {
-    if (searchParams.get("error") === "OAuthAccountNotLinked") {
-      setFormMessage({
-        type: "error",
-        message: "Email already in use with different provider!",
-      });
-    }
-  }, [searchParams]);
-
   return (
     <CardWrapper
-      headerLabel="Welcome to Login"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
-      showSocial
+      headerLabel="Enter a new password"
+      backButtonLabel="Back to login"
+      backButtonHref="/auth/login"
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             {/* Email  */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="john@example.com"
-                      type="email"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Password */}
             <FormField
               control={form.control}
               name="password"
@@ -97,9 +68,6 @@ function LoginForm() {
                 </FormItem>
               )}
             />
-            <Button variant="link" className="px-0">
-              <Link href="/auth/reset">Forgot password?</Link>
-            </Button>
           </div>
 
           {/* Form Error Message from server */}
@@ -108,7 +76,7 @@ function LoginForm() {
             message={formMessage.message}
           />
           <Button className="w-full" type="submit">
-            Login
+            Reset password
           </Button>
         </form>
       </Form>
@@ -116,4 +84,4 @@ function LoginForm() {
   );
 }
 
-export default LoginForm;
+export default NewPasswordForm;

@@ -20,11 +20,16 @@ function MewVerificationForm() {
   });
 
   const onSubmit = useCallback(() => {
-    if (!token) return;
+    if (formMessage.message) return;
+
+    if (!token) {
+      setFormMessage({ type: "error", message: "Missing token!" });
+      return;
+    }
     newVerification(token)
       .then((res) => setFormMessage(res))
       .catch((res) => setFormMessage(res));
-  }, [token]);
+  }, [token, formMessage.message]);
 
   useEffect(() => {
     onSubmit();
