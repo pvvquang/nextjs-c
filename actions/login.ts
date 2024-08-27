@@ -114,7 +114,7 @@ export async function login(values: string): Promise<FormMessageServer> {
 
 export async function checkUserExists(_email: string) {
   try {
-    const userExists = getUserByEmail(_email);
+    const userExists = await getUserByEmail(_email);
     if (!userExists) {
       await signOut();
       redirect(DEFAULT_LOGIN);
