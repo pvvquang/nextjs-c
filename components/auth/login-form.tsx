@@ -28,6 +28,7 @@ function LoginForm() {
     type: "error",
     message: "",
   });
+  const [isShowTwoFactor, setIsShowTwoFactor] = useState(false);
 
   const form = useForm<LoginFormValue>({
     resolver: zodResolver(LoginSchema),
@@ -41,7 +42,10 @@ function LoginForm() {
     const payload = encryptData(values);
     startTransition(() => {
       login(payload)
-        .then(({ type, message }) => setFormMessage({ type, message }))
+        .then(({ type, message, isTwoFactor }) => {
+          if (isTwoFactor) setIsShowTwoFactor(true);
+          setFormMessage({ type, message });
+        })
         .catch(({ type, message }) => setFormMessage({ type, message }));
     });
   };
@@ -65,38 +69,62 @@ function LoginForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
-            {/* Email  */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="john@example.com"
-                      type="email"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Password */}
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="******" type="password" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {isShowTwoFactor && (
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Two Factor Code</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="123456" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {!isShowTwoFactor && (
+              <>
+                {/* Email  */}
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="john@example.com"
+                          type="email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Password */}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="******"
+                          type="password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
             <Button variant="link" className="px-0">
               <Link href="/auth/reset">Forgot password?</Link>
             </Button>
@@ -108,7 +136,7 @@ function LoginForm() {
             message={formMessage.message}
           />
           <Button className="w-full" type="submit">
-            Login
+            {isShowTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>
       </Form>
