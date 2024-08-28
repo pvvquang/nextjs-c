@@ -8,7 +8,6 @@ import UserButton from "@/components/auth/user-button";
 
 const Navbar = () => {
   const pathname = usePathname();
-  console.log({ pathname });
 
   return (
     <div className="p-4 bg-white rounded-xl shadow-sm w-full max-w-[600px]">

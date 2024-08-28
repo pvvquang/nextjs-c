@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 import ProgressBar from "@/components/common/progress-bar";
 import { SessionProvider } from "next-auth/react";
@@ -22,6 +23,7 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <ProgressBar />
+          <Toaster />
           {children}
         </body>
       </html>
