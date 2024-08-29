@@ -27,8 +27,10 @@ const UserButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem>
-          <LogOut className="w-4 h-4 mr-2" />
-          <LogoutButton>Logout</LogoutButton>
+          <LogoutButton containerClass="flex items-center w-full">
+            <LogOut className="w-4 h-4 mr-2" />
+            Logout
+          </LogoutButton>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

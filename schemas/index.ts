@@ -34,6 +34,10 @@ export const SettingSchema = z
     password: z.optional(z.string().min(6)),
     newPassword: z.optional(z.string().min(6)),
   })
+  .refine((data) => {
+    if (!data.password && !data.newPassword) return true;
+    return true;
+  })
   .refine(
     (data) => {
       if (data.password && !data.newPassword) return false;
@@ -49,4 +53,4 @@ export const SettingSchema = z
     { message: "Password is required!", path: ["password"] }
   );
 
-export type SettingValueForm = z.infer<typeof SettingSchema>
+export type SettingValueForm = z.infer<typeof SettingSchema>;

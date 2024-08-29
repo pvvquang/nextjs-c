@@ -71,8 +71,7 @@ export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
       token.isOAuth = !!existingAccount;
       token.role = existingUser.role;
       token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-
-      console.log({ token });
+      token.name = existingUser.name;
 
       return token;
     },

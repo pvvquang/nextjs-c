@@ -180,28 +180,30 @@ const SettingsPage = () => {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="isTwoFactorEnabled"
-              render={({ field }) => (
-                <FormItem className="flex items-center justify-between">
-                  <div>
-                    <FormLabel>Two Factor Authentication</FormLabel>
-                    <FormDescription>
-                      Enabled two factor authentication for your account
-                    </FormDescription>
-                  </div>
-                  <FormControl>
-                    <Switch
-                      disabled={isPending}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {!user?.isOAuth && (
+              <FormField
+                control={form.control}
+                name="isTwoFactorEnabled"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between">
+                    <div>
+                      <FormLabel>Two Factor Authentication</FormLabel>
+                      <FormDescription>
+                        Enabled two factor authentication for your account
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        disabled={isPending}
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/* Form Error Message from server */}
             <FormMessageCustom
