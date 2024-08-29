@@ -1,5 +1,5 @@
 "use client";
-import { startTransition, useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema, LoginFormValue } from "@/schemas";
@@ -24,6 +24,8 @@ import { encryptData } from "@/components/auth/register-form";
 
 function LoginForm() {
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
   const [formMessage, setFormMessage] = useState<FormMessageServer>({
     type: "error",
     message: "",
@@ -135,7 +137,7 @@ function LoginForm() {
             type={formMessage.type}
             message={formMessage.message}
           />
-          <Button className="w-full" type="submit">
+          <Button className="w-full" type="submit" disabled={isPending}>
             {isShowTwoFactor ? "Confirm" : "Login"}
           </Button>
         </form>

@@ -2,19 +2,19 @@ import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { UserRole } from "@prisma/client";
 
-import authConfig from "@/auth.config";
 import { db } from "@/lib/db";
+import authConfig from "@/auth.config";
 import { getUserById, updateUserVerifiedEmail } from "@/data/user";
 import { getTwoFactorConfirmationByUserId } from "@/data/two-factor-confirmation";
+import { getAccountByUserId } from "@/data/account";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, signOut, auth, unstable_update } = NextAuth({
   pages: {
     signIn: "/auth/login",
     error: "/auth/error",
   },
   events: {
     linkAccount({ user }) {
-      console.log("link Account::", user.id);
       user.id && updateUserVerifiedEmail(user.id);
     },
   },
@@ -53,16 +53,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if ("isTwoFactorEnabled" in token && session.user) {
         session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
       }
+      if (session.user) {
+        session.user.name = token.name;
+        session.user.email = token.email as string;
+        session.user.isOAuth = token.isOAuth as boolean;
+      }
       return session;
     },
     async jwt({ token }) {
-      if (token.sub) {
-        const existingUser = await getUserById(token.sub);
-        if (existingUser) {
-          token.role = existingUser.role;
-          token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
-        }
-      }
+      if (!token.sub) return token;
+
+      const existingUser = await getUserById(token.sub);
+      if (!existingUser) return token;
+
+      const existingAccount = await getAccountByUserId(existingUser.id);
+
+      token.isOAuth = !!existingAccount;
+      token.role = existingUser.role;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+
+      console.log({ token });
+
       return token;
     },
   },

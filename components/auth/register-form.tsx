@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CryptoJS from "crypto-js";
@@ -35,6 +35,8 @@ function RegisterForm() {
     message: "",
   });
 
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<RegisterFormValue>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -46,9 +48,11 @@ function RegisterForm() {
 
   const onSubmit = (values: RegisterFormValue) => {
     const payload = encryptData(values);
-    createAccount(payload)
-      .then(({ type, message }) => setFormMessage({ type, message }))
-      .catch(({ type, message }) => setFormMessage({ type, message }));
+    startTransition(() => {
+      createAccount(payload)
+        .then(({ type, message }) => setFormMessage({ type, message }))
+        .catch(({ type, message }) => setFormMessage({ type, message }));
+    });
   };
 
   return (
@@ -113,7 +117,7 @@ function RegisterForm() {
             type={formMessage.type}
             message={formMessage.message}
           />
-          <Button className="w-full" type="submit">
+          <Button className="w-full" type="submit" disabled={isPending}>
             Create an account
           </Button>
         </form>

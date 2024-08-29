@@ -12,7 +12,6 @@ import { checkAdmin } from "@/actions/admin";
 const AdminPage = () => {
   const onApiRouteClick = () => {
     fetch("/api/admin").then((res) => {
-      console.log({ res });
       if (res.ok) {
         toast.success("Allowed API Route!");
       } else {
